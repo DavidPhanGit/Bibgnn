@@ -8,6 +8,8 @@ import math
 from collections import Counter
 from itertools import *
 import networkx as nx
+from jit_graph import jit_graph, jit_data
+
 import json
 from tqdm import tqdm
 from gensim.models import Word2Vec
@@ -41,7 +43,7 @@ parser.add_argument('--walk_L', type=int, default=30,
                     help='length of each walk')
 parser.add_argument('--window', type=int, default=7,
                     help='window size for relation extraction')
-parser.add_argument('--T_split', type=int, default=2012,
+parser.add_argument('--T_split', type=int, default=2015,
                     help='split time of train/test data')
 
 args = parser.parse_args()
@@ -304,6 +306,7 @@ class input_data(object):
         print("a_a_test_num: " + str(test_num))
 
     def a_p_citation_train_test(self):
+        '''
         p_time = [0] * args.P_n
         p_time_f = open(args.data_path + "p_time.txt", "r")
         for line in p_time_f:
@@ -312,6 +315,7 @@ class input_data(object):
             time = int(re.split('\t', line)[1])
             p_time[p_id] = time + 2005
         p_time_f.close()
+        '''
 
         a_p_cite_list_train = [[] for k in range(self.args.A_n)]
         a_p_cite_list_test = [[] for k in range(self.args.A_n)]
@@ -319,6 +323,7 @@ class input_data(object):
         p_p_cite_list_train = self.p_p_cite_list_train
         p_p_cite_list_test = self.p_p_cite_list_test
 
+        
         for t in range(len(a_p_list)):
             for i in range(len(a_p_list[t])):
                 for j in range(len(a_p_list[t][i])):
@@ -331,7 +336,7 @@ class input_data(object):
                             p_id = int(a_p_list[t][i][j][1:])
                             for k in range(len(p_p_cite_list_test[p_id])):
                                 cite_index = int(p_p_cite_list_test[p_id][k][1:])
-                                if p_time[cite_index] < args.T_split and (cite_index not in a_p_cite_list_train[i]):
+                                if (cite_index not in a_p_cite_list_train[i]):
                                     a_p_cite_list_test[i].append(cite_index)
 
         for i in range(self.args.A_n):
@@ -392,9 +397,9 @@ class input_data(object):
         a_v_list_train_f = open(args.data_path + "a_v_list_train.txt", "w")
         a_v_list_test_f = open(args.data_path + "a_v_list_test.txt", "w")
         a_v_list = [a_v_list_train, a_v_list_test]
-        # train_num = 0
-        # test_num = 0
-        # test_a_num = 0
+        train_num = 0
+        test_num = 0
+        test_a_num = 0
         for t in range(len(a_v_list)):
             for i in range(len(a_v_list[t])):
                 if t == 0:
@@ -402,22 +407,22 @@ class input_data(object):
                         a_v_list_train_f.write(str(i) + ":")
                         for j in range(len(a_v_list[t][i])):
                             a_v_list_train_f.write(str(a_v_list[t][i][j]) + ",")
-                        # train_num += 1
+                        train_num += 1
                         a_v_list_train_f.write("\n")
                 else:
                     if len(a_v_list[t][i]):
-                        # test_a_num += 1
+                        test_a_num += 1
                         a_v_list_test_f.write(str(i) + ":")
                         for j in range(len(a_v_list[t][i])):
                             a_v_list_test_f.write(str(a_v_list[t][i][j]) + ",")
-                        # test_num += 1
+                        test_num += 1
                         a_v_list_test_f.write("\n")
         a_v_list_train_f.close()
         a_v_list_test_f.close()
 
-    # print("a_v_train_num: " + str(train_num))
-    # print("a_v_test_num: " + str(test_num))
-    # print (float(test_num) / test_a_num)
+        print("a_v_train_num: " + str(train_num))
+        print("a_v_test_num: " + str(test_num))
+        print (float(test_num) / test_a_num)
 
     def a_t_write_train_test(self):
         train_num = 0
@@ -428,7 +433,7 @@ class input_data(object):
 
         authors = json.loads(open(write_path + '/' + 'author.json', 'r').read())
         topics = json.loads(open(write_path + '/' + 'topic.json', 'r').read())
-        train_atg = nx.Graph(nx.jit_graph(
+        train_atg = nx.Graph(jit_graph(
             open(f'../../../JASIST_Diffusion/input/dblp_baby_data/before_networks/AT.json', 'r',
                  encoding='UTF-8').read()))
         test_atg = json.loads(
@@ -547,24 +552,25 @@ class input_data(object):
         model.wv.save_word2vec_format(self.args.data_path + "node_net_embedding.txt")
 
 
+
 input_data_class = input_data(args=args)
 
-# input_data_class.a_t_write_train_test()
+#input_data_class.a_t_write_train_test()
 #
-input_data_class.gen_het_rand_walk()
+#input_data_class.gen_het_rand_walk()
 
-input_data_class.read_random_walk_corpus()
+#input_data_class.read_random_walk_corpus()
 
 # input_data_class.gen_meta_rand_walk_APVPA()
 #
 #
-# input_data_class.a_a_collaborate_train_test()  # set author-author collaboration data
+#input_data_class.a_a_collaborate_train_test()  # set author-author collaboration data
 
 input_data_class.t_t_recombination_test()  # set author-author collaboration data
 
 #
 #
-# input_data_class.a_p_citation_train_test() #set author-paper citation data
+#input_data_class.a_p_citation_train_test() #set author-paper citation data
 #
 #
 # input_data_class.a_v_train_test()  # generate author-venue data

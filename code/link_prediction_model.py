@@ -10,28 +10,13 @@ import csv
 import argparse
 import json
 
-# parser = argparse.ArgumentParser(description='link prediction task')
-# parser.add_argument('--A_n', type=int, default=14521,
-#                     help='number of author node')
-# parser.add_argument('--P_n', type=int, default=11399,
-#                     help='number of paper node')
-# parser.add_argument('--V_n', type=int, default=5,
-#                     help='number of venue node')
-# parser.add_argument('--data_path', type=str, default='../data/bibtest_2015/',
-#                     help='path to data')
-# parser.add_argument('--embed_d', type=int, default=128,
-#                     help='embedding dimension')
-#
-# args = parser.parse_args()
-# print(args)
-
 
 def load_data(data_file_name, n_features, n_samples):
     with open(data_file_name) as f:
         data_file = csv.reader(f)
         data = numpy.empty((n_samples, n_features))
         for i, d in enumerate(data_file):
-            data[i] = numpy.asarray(d[:], dtype=numpy.float)
+            data[i] = numpy.asarray(d[:], dtype=float)
         f.close()
 
         return data
@@ -70,8 +55,18 @@ def model(data_path, train_num, test_num):
         output_f.write('%d, %d, %lf\n' % (test_id[i][0], test_id[i][1], test_predict[i]));
     output_f.close()
 
-    # AUC_score = Metric.roc_auc_score(test_target, test_predict)
-    # print("AUC: " + str(AUC_score))
+    '''
+    unique = []
+    for i in range(len(test_predict)):
+        if test_predict[i] not in unique:
+            unique.append(test_predict[i])
+
+    print("unique: ")
+    print(unique)
+    '''
+
+    #AUC_score = Metric.roc_auc_score(test_target, test_predict)
+    #print("AUC: " + str(AUC_score))
 
     total_count = 0
     correct_count = 0
@@ -101,19 +96,26 @@ def model(data_path, train_num, test_num):
             true_1_count += 1
         if int(test_predict[i]) == 2 and int(test_target[i]) == 2:
             true_2_count += 1
-        # if int(test_predict[i]) == 1 and int(test_target[i]) == 0:
-        #     false_p_count += 1
-        # if int(test_predict[i]) == 0 and int(test_target[i]) == 1:
-        #     false_n_count += 1
+        if int(test_predict[i]) == 1 and int(test_target[i] == 1):
+            true_p_count += 1
+        if int(test_predict[i]) == 1 and int(test_target[i]) == 0:
+            false_p_count += 1
+        if int(test_predict[i]) == 0 and int(test_target[i]) == 1:
+            false_n_count += 1
 
+    print("total count: " + str(total_count))
+    print("all_0_count: " + str(all_0_count))
+    print("all_1_count: " + str(all_1_count))
+    print("all_2_count: " + str(all_2_count))
+    #print("added: " + str(all_0_count + all_1_count + all_2_count))
     print("accuracy: " + str(float(correct_count) / total_count))
     print("accuracy 0: " + str(float(true_0_count) / all_0_count))
     print("accuracy 1: " + str(float(true_1_count) / all_1_count))
     print("accuracy 2: " + str(float(true_2_count) / all_2_count))
 
-    # precision = float(true_p_count) / (true_p_count + false_p_count)
-    # print("precision: " + str(precision))
-    # recall = float(true_p_count) / (true_p_count + false_n_count)
-    # print("recall: " + str(recall))
-    # F1 = float(2 * precision * recall) / (precision + recall)
-    # print("F1: " + str(F1))
+    precision = float(true_p_count) / (true_p_count + false_p_count)
+    print("precision: " + str(precision))
+    recall = float(true_p_count) / (true_p_count + false_n_count)
+    print("recall: " + str(recall))
+    F1 = float(2 * precision * recall) / (precision + recall)
+    print("F1: " + str(F1))

@@ -498,14 +498,14 @@ def t_t_recombination_feature_setting():
     return train_num, test_num
 
 
-# print("------author collaboration link prediction------")
-# train_num, test_num = a_a_collab_feature_setting()  # setup of author-author collaboration prediction task
-# LP.model(train_num, test_num)
-# print("------author collaboration link prediction end------")
+#print("------author collaboration link prediction------")
+#train_num, test_num = a_a_collab_feature_setting()  # setup of author-author collaboration prediction task
+#LP.model(args.data_path, train_num, test_num)
+#print("------author collaboration link prediction end------")
 
 # print("------author paper citation link prediction------")
 # train_num, test_num = a_p_cite_feature_setting()  # setup of author-paper citation prediction task
-# LP.model(train_num, test_num)
+# LP.model(args.data_path, train_num, test_num)
 # print("------author paper citation link prediction end------")
 
 # print("------venue recommendation------")

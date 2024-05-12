@@ -114,7 +114,7 @@ class model_class(object):
                     print("loss: " + str(loss))
 
             if iter_i % self.args.save_model_freq == 0:
-                torch.save(self.model.state_dict(), self.args.model_path + "HetGNN_" + str(iter_i) + ".pt")
+                torch.save(self.model.state_dict(), self.args.model_path + "TestHetGNN_" + str(iter_i) + ".pt")
                 # save embeddings for evaluation
                 triple_index = 16
                 a_out, p_out, v_out = self.model([], triple_index)
@@ -135,6 +135,11 @@ if __name__ == '__main__':
 
     # model
     model_object = model_class(args)
+    model_object.model.load_state_dict(torch.load('../model_save/bibtest_2015/HetGNN_0.pt'))
+
+    #print(model_object.model.state_dict())
+    #triple_list = model_object.input_data.sample_het_walk_triple()
+    #print(model_object.model.forward(triple_list[200:400], 2))
 
     if args.train_test_label == 0:
         model_object.model_train()
